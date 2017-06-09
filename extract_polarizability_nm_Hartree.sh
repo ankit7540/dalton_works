@@ -4,7 +4,7 @@
 nlines="$1" # number of lines of the polarizability calculated (number of freqs)
 of="$2"  # .out file =>> output file
 desc="$3" # description here for file name (will be used for the file name)
-
+#---------------------------------------------------------------------------
 dir=$(pwd)
 
 #rm nm t1 t2 t3
@@ -34,6 +34,9 @@ echo "$filename"".txt will be generated in a folder called result".
 paste -d'\t' nm t1 t2 t3 >   temp
 mv temp $filename.txt
 
-sed -i '1s/^/nm Hartree ZZ      XX\n/' $filename.txt
+#save and move result
+sed -i '1s/^/nm Hartree ZZ      XX\n/' $filename.txt 
 mv $filename.txt  result/.
+
+#remove temporary files
 rm t1 t2 t3 nm
