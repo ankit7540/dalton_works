@@ -2,6 +2,8 @@
 # This script sets the environment variables and starts the build process of the DALTON program.
 
 # Edit the cores of CPU below.
+cores=6
+
 # Scratch disk is set to RAID0 array.
 # Compiler set to Intel 2017. ( Change as your need).
 
@@ -12,7 +14,7 @@ echo "$build_folder"
 
     echo "-----------------------------------------------"
     export DALTON_TMPDIR=/mnt/raid0/scratch
-    export OMP_NUM_THREADS=6
+    export OMP_NUM_THREADS=$cores
     source /opt/intel/compilers_and_libraries_2017.0.098/linux/bin/compilervars.sh intel64
     source /opt/intel/mkl/bin/mklvars.sh intel64
     export MATH_ROOT='/opt/intel/mkl' 
@@ -20,3 +22,9 @@ echo "$build_folder"
 
 
 ./setup --int64  --fc=ifort --cc=icc --cxx=icpc --mkl=parallel --prefix=~/ChemPackage/dalton/dalton64bit/   $build_folder
+
+cd $build_folder
+
+make -j $cores 
+
+make install
