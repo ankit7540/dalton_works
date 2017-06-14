@@ -14,6 +14,8 @@
     df -h /dev/md0
     echo "-----------------------------------------------"
     
+    # Log of the current job. Will be saved with start and end time and this message which 
+    # +is asked after script is executed.
     echo -n "Enter calculation details and press [ENTER]: "
     read  -e  -n 500 text
     
@@ -30,5 +32,7 @@
     ./dalton -b ~/dalton/ExtBasis   -w  "$dir"    -mb $mem $d $m
 
     dt2=$(date '+%d/%m/%Y %H:%M:%S');
-    printf "\n$dt1\nFrom : $dir\nRunning : $d\t$m\nDetail : $text\n$dt2\n--------------------------------------------------------\n" >> /home/vayu/dalton/runlog.log
+ 
+ 
+ printf "\n$dt1\nFrom : $dir\nRunning : $d\t$m\nDetail : $text\n$dt2\n--------------------------------------------------------\n" >> /home/<user>/dalton/runlog.log
 echo "//-----------------process FINISHED ----------------//"
