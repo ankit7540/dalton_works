@@ -23,8 +23,26 @@ echo "$build_folder"
 
 ./setup --int64  --fc=ifort --cc=icc --cxx=icpc --mkl=parallel --prefix=~/ChemPackage/dalton/dalton64bit/   $build_folder
 
-cd $build_folder
+read -r -p "Are you sure? [y/N] " response
+if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]
+then
+    cd $build_folder
+        echo -e ""
+        echo "-----------------------------------------------"
+        echo "----------- MAKE WILL START -------------------"
+        echo "-----------------------------------------------"
+        echo -e ""
+    make -j $cores
+        echo "-----------------------------------------------"
+        echo "-------- INSTALLATION WILL START --------------"
+        echo "-----------------------------------------------"
+    make install
+else
+    exit 1
+fi
 
-make -j $cores 
 
-make install
+
+ 
+
+
