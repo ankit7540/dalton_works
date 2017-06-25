@@ -38,6 +38,7 @@ then
         echo "-----------------------------------------------"
     make install
 else
+    echo -e "Script will exit. Please remember to delete the build folder."
     exit 1
 fi
 
