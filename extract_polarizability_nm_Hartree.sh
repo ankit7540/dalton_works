@@ -1,9 +1,10 @@
 #!/bin/bash
 # to extract the values of the polarizability for different wavelengths in Hartree from output file and save as txt file
-# with cols as freq(hartree), freq(nm), alpha_zz, alpha_xx
-nlines="$1" # number of lines of the polarizability calculated (number of freqs)
+# with cols as energy of field(hartree), wavelength(nm), polarizabiltities, alpha_zz and alpha_xx.
+
+nlines="$1" # number of lines of the polarizability calculated (number of wavelengths)
 of="$2"  # .out file =>> output file
-desc="$3" # description here for file name (will be used for the file name)
+desc="$3" # description here for file name (will be used for the file name of new generated file)
 #---------------------------------------------------------------------------
 dir=$(pwd)
 
