@@ -37,7 +37,6 @@ echo ${freq[1]},${freq[0]}
 cp distance${freq[0]}.txt distance.txt
 rm distance${freq[0]}.txt ; rm distance$k.txt
 rm temp*.txt
-rm temp.txt
 
 cp distance.txt output_freq/distance.txt
 cd output_freq
@@ -59,3 +58,5 @@ sed -i -e '1iomega\' freq_trimmed.txt
 mkdir  original_array
 mv *_xxn original_array/.
 mv *_zzn original_array/.
+
+echo "--end--"
