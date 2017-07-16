@@ -7,6 +7,8 @@ echo "You entered: $iv, $fname" ;
 #---------------------------------------------------------------------------------
 rm -f g_distance.txt
 rm -rf output_0
+rm static0.txt
+#---------------------------------------------------------------------------------
 mkdir output_0
 i=1 ; lim=$(($iv+1))
 while [ $i -lt $lim ] ;  do
@@ -23,5 +25,5 @@ rm temp0
 echo "$(($i-1))"_processed
 cp g_distance.txt output_0/g_distance.txt
 cp static0.txt  output_0/static0.txt
-echo "Rearranged as 1-d array."
+echo "1-d array of static polarizability vs r is generated."
 echo "--end--"
