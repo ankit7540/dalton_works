@@ -1,12 +1,12 @@
 #!/bin/bash
 # Author : Ankit
-#Date : 04162017
+# Date : 04162017
 # Purpose : Extract data from DALTON output files for alpha xx, zz and compare to reference. Result stored in a file  called result.
 # Iteration over available files with file index from 1 to n.
 #-------------------------------------------------------------------------------
 
 folder=${PWD##*/}
-
+# reference is from the work of Rychlewski 1980 Mol. Phys.
 echo "Please enter the number of files (max index number of file): "
 read iv
 #echo "Please enter the file name (without number): "
