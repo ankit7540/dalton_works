@@ -13,11 +13,11 @@ build_folder="build"_"$now"
 echo "$build_folder"
 
     echo "-----------------------------------------------"
+    # gcc, g++, gfortran will be auto detected.
     export DALTON_TMPDIR=/mnt/raid0/scratch
     export OMP_NUM_THREADS=$cores
-#    source /opt/intel/compilers_and_libraries_2017.0.098/linux/bin/compilervars.sh intel64
-#   source /opt/intel/mkl/bin/mklvars.sh intel64
-    export MATH_ROOT='/opt/intel/mkl' 
+    export MATH_ROOT='/opt/intel/mkl' # if installed then MKL's BLAS LAPACK libraries will be used.
+    # if not then do install open source BLA and LAPACK libraries.
     echo "-----------------------------------------------"
 
 mkdir /home/vani/ChemPackages/dalton_gcc_gfortran
