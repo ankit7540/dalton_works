@@ -1,11 +1,11 @@
 # dalton_extracts
 
 Contains scripts for 
--initializing dalton installation on a linux system (gcc and intel compilers, MKL, bash shell ) : starts the build procoess by exporting the variables needed, and then building
+ -initializing dalton installation on a linux system (gcc and intel compilers, MKL, bash shell ) : starts the build procoess by exporting the variables needed, and then building
 
--initializing  a basic calculation : Used for running a calculation job. It sources the compilers, scratch direrctory and allocates memory, CPU cores and starts calculation. A log is created for every calcualtion storing the file names, directory, description and the time taken.
+ -initializing  a basic calculation : Used for running a calculation job. It sources the compilers, scratch direrctory and allocates memory, CPU cores and starts calculation. A log is created for every calcualtion storing the file names, directory, description and the time taken.
 
--extracting output from Coupled Cluster (CC) and DFT calculations
+ -extracting output from Coupled Cluster (CC) and DFT calculations
 
 
 
