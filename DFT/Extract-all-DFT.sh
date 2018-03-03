@@ -1,4 +1,5 @@
 #!/bin/bash
+    
 # take out energy, dipole moment, polarizability and hyperpolarizability from DALTON DFT output file.
 # run as loop over n files where for each n file  -2 to +2 additional files are available in the same folder.
 
@@ -58,35 +59,7 @@ k=-2
 
         echo ""
         # Polarizability
-	# to be changed to new code for dft : get the written code , presently on varsh 
-
-	# present is for CCSD
-
-        xx=$(grep "XDIPLEN  (unrel.) -0.0856   XDIPLEN  (unrel.)  0.0856" "$fname"_"$i"_"$k".out  | awk {'print $7'} )
-        xy=$(grep "XDIPLEN  (unrel.) -0.0856   YDIPLEN  (unrel.)  0.0856" "$fname"_"$i"_"$k".out  | awk {'print $7'} )
-        xz=$(grep "XDIPLEN  (unrel.) -0.0856   ZDIPLEN  (unrel.)  0.0856" "$fname"_"$i"_"$k".out  | awk {'print $7'} )
-        yx=$(grep "YDIPLEN  (unrel.) -0.0856   XDIPLEN  (unrel.)  0.0856" "$fname"_"$i"_"$k".out  | awk {'print $7'} )
-        yy=$(grep "YDIPLEN  (unrel.) -0.0856   YDIPLEN  (unrel.)  0.0856" "$fname"_"$i"_"$k".out  | awk {'print $7'} )
-        yz=$(grep "YDIPLEN  (unrel.) -0.0856   ZDIPLEN  (unrel.)  0.0856" "$fname"_"$i"_"$k".out  | awk {'print $7'} )
-        zx=$(grep "ZDIPLEN  (unrel.) -0.0856   XDIPLEN  (unrel.)  0.0856" "$fname"_"$i"_"$k".out  | awk {'print $7'} )
-        zy=$(grep "ZDIPLEN  (unrel.) -0.0856   YDIPLEN  (unrel.)  0.0856" "$fname"_"$i"_"$k".out  | awk {'print $7'} )
-        zz=$(grep "ZDIPLEN  (unrel.) -0.0856   ZDIPLEN  (unrel.)  0.0856" "$fname"_"$i"_"$k".out  | awk {'print $7'} )
-
-        if [ -z  "$xx" ]; then xx=0 ; fi
-        if [ -z  "$xy" ]; then xy=0 ; fi
-        if [ -z  "$xz" ]; then xz=0 ; fi
-        if [ -z  "$yx" ]; then yx=0 ; fi
-        if [ -z  "$yy" ]; then yy=0 ; fi
-        if [ -z  "$yz" ]; then yz=0 ; fi
-        if [ -z  "$zx" ]; then zx=0 ; fi
-        if [ -z  "$zy" ]; then zy=0 ; fi
-        if [ -z  "$zz" ]; then zz=0 ; fi
-
-
-        printf "Polarizability\n"
-        echo "$xx,$xy,$xz"
-#       echo "$yx,$yy,$yz"
-#       echo "$zx,$zy,$zz"
+	    ./Extract-DFT-polarizability
 
         # Dipole moment part of output exported to a temp file (for DFT, same as CCSD)
 	grep -A 10 "Dipole moment components" "$fname"_"$i"_"$k".out > muTemp 
