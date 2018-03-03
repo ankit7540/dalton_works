@@ -25,79 +25,94 @@ k=-2
     mkdir  property/mode_$i
     while [ "$k" -le 2 ]
     do
-    #echo "$fname"_"$i"_"$k".out
-    file = $(echo "$fname"_"$i"_"$k".out)
-    echo "$file"
-    ##############  Hyperpolarizability ##############
-    grep -A 110  "DFT-QR computed in a linearly-scaling fashion." "$file" > temp
-    tail -109 temp > temp2
+        #echo "$fname"_"$i"_"$k".out
+        file = $(echo "$fname"_"$i"_"$k".out)
+        echo "$file"
+        #####################  Hyperpolarizability #####################
+        grep -A 110  "DFT-QR computed in a linearly-scaling fashion." "$file" > temp
+        tail -109 temp > temp2
 
-    awk '{print $8 $9 $10}' temp2 > temp3
+        awk '{print $8 $9 $10}' temp2 > temp3
 
-    sed -i 's/;/,/g' temp3
-    sed -i 's/X/0/g' temp3
-    sed -i 's/Y/1/g' temp3
-    sed -i 's/Z/2/g' temp3
+        sed -i 's/;/,/g' temp3
+        sed -i 's/X/0/g' temp3
+        sed -i 's/Y/1/g' temp3
+        sed -i 's/Z/2/g' temp3
 
-    # square brackets for python matrix assignment
-    sed -i 's/(/[/g' temp3
-    sed -i 's/)/]/g' temp3
-    sed -i 's/,/][/g' temp3
+        # square brackets for python matrix assignment
+        sed -i 's/(/[/g' temp3
+        sed -i 's/)/]/g' temp3
+        sed -i 's/,/][/g' temp3
 
-    # next write up a python script to set up matrix 3x3x3 from which
-    # three 3x3 matrices are extracted for Igor output.
+        # next write up a python script to set up matrix 3x3x3 from which
+        # three 3x3 matrices are extracted for Igor output.
 
-    echo "# python script : generate hyperpolarizability tensor and also three matrices" > process_beta.py
+        echo "# python script : generate hyperpolarizability tensor and also three matrices" > process_beta.py
+        
+        echo "import numpy as np" >> process_beta.py
+
+        echo "beta=np.zeros((3,3,3))" >> process_beta.py
+        cat temp3 >> process_beta.py
+
+        echo "print(beta)" >> process_beta.py
+
+        #-------------------------------------------------
+
+        # post processing  the beta tensor 
+
+        cat rank3tensor_split.py >> process_beta.py
+        python process_beta.py
+
+        # generating the itx files
+        sed -i '1s/^/IGOR\n/' b0.txt
+        sed -i '2s|^|WAVES /D /N=(3,3) b'"$i"0"$k"'\n|' "b0.txt"
+        sed -i '3s/^/BEGIN\n/' b0.txt
+        echo -e 'END' >> b0.txt
+        sed -i "2 s/b/'b/;2 s/$/'/" b0.txt
+        cat b0.txt > property/mode_$i/b"$i"0"$k".itx
+
+
+        sed -i '1s/^/IGOR\n/' b1.txt
+        sed -i '2s|^|WAVES /D /N=(3,3) b'"$i"1"$k"'\n|' "b1.txt"
+        sed -i '3s/^/BEGIN\n/' b1.txt
+        echo -e 'END' >> b1.txt
+        sed -i "2 s/b/'b/;2 s/$/'/" b1.txt
+        cat b1.txt > property/mode_$i/b"$i"1"$k".itx
+
+
+        sed -i '1s/^/IGOR\n/' b2.txt
+        sed -i '2s|^|WAVES /D /N=(3,3) b'"$i"2"$k"'\n|' "b2.txt"
+        sed -i '3s/^/BEGIN\n/' b2.txt
+        echo -e 'END' >> b2.txt
+        sed -i "2 s/b/'b/;2 s/$/'/" b2.txt
+        cat b2.txt > property/mode_$i/b"$i"2"$k".itx
+
+        rm b0.txt b1.txt b2.txt
+        rm temp temp2 temp3 
+
+        #####################################################################################
     
-    echo "import numpy as np" >> process_beta.py
-
-    echo "beta=np.zeros((3,3,3))" >> process_beta.py
-    cat temp3 >> process_beta.py
-
-    echo "print(beta)" >> process_beta.py
-
-    #-------------------------------------------------
-
-    # post processing  the beta tensor 
-
-    cat rank3tensor_split.py >> process_beta.py
-    python process_beta.py
-
-    # generating the itx files
-    sed -i '1s/^/IGOR\n/' b0.txt
-    sed -i '2s|^|WAVES /D /N=(3,3) b'"$i"0"$k"'\n|' "b0.txt"
-    sed -i '3s/^/BEGIN\n/' b0.txt
-    echo -e 'END' >> b0.txt
-    sed -i "2 s/b/'b/;2 s/$/'/" b0.txt
-    cat b0.txt > property/mode_$i/b"$i"0"$k".itx
-
-
-    sed -i '1s/^/IGOR\n/' b1.txt
-    sed -i '2s|^|WAVES /D /N=(3,3) b'"$i"1"$k"'\n|' "b1.txt"
-    sed -i '3s/^/BEGIN\n/' b1.txt
-    echo -e 'END' >> b1.txt
-    sed -i "2 s/b/'b/;2 s/$/'/" b1.txt
-    cat b1.txt > property/mode_$i/b"$i"1"$k".itx
-
-
-    sed -i '1s/^/IGOR\n/' b2.txt
-    sed -i '2s|^|WAVES /D /N=(3,3) b'"$i"2"$k"'\n|' "b2.txt"
-    sed -i '3s/^/BEGIN\n/' b2.txt
-    echo -e 'END' >> b2.txt
-    sed -i "2 s/b/'b/;2 s/$/'/" b2.txt
-    cat b2.txt > property/mode_$i/b"$i"2"$k".itx
-
-    rm b0.txt b1.txt b2.txt
-    rm temp temp2 temp3 
-
-    #####################################################################################
-        echo ""
-        # Polarizability
+        ###################### Polarizability ######################
+    
 	    sh ./Extract-DFT-polarizability "$file"
         # output will be generated in polarizability.dat
+        s=$(<file)
+        set -- $s
+        echo "$1"
+        echo "$2"
+        echo "$3"
+        echo "$4"
+        echo "$5"
+        echo "$6"
+        echo "$7"
+        echo "$8"
+        echo "$9"
+        #xx = 
 
+        ###################### Dipole moment ######################
+    
         # Dipole moment part of output exported to a temp file (for DFT, same as CCSD)
-	grep -A 10 "Dipole moment components" "$fname"_"$i"_"$k".out > muTemp 
+        grep -A 10 "Dipole moment components" "$fname"_"$i"_"$k".out > muTemp 
         mu_x=$(grep "      x     "  "muTemp" | awk {'print $2'} )
         mu_y=$(grep "      y     "  "muTemp" | awk {'print $2'} )
         mu_z=$(grep "      z     "  "muTemp" | awk {'print $2'} )
@@ -112,7 +127,7 @@ k=-2
 
         #Energy
         # new code updated for DFT
-	en = $(grep -A 100 "End of optimization            :       T" dft_opt_freq_beta_benzene_TZ.out | grep "Total energy"| awk '{print $3}')
+        en = $(grep -A 100 "End of optimization            :       T" dft_opt_freq_beta_benzene_TZ.out | grep "Total energy"| awk '{print $3}')
         #	en=$(grep "            Total CCSD  energy:         " "$fname"_"$i"_"$k".out   | awk {'print $4'} | xargs| awk {'print $1'}  )
         #	echo "energy:"."$en"
 
@@ -121,56 +136,6 @@ k=-2
         echo "$en"
 
         # FORMATTING AND SAVING OUTPUT FILES ------------------------------------------------
-        # making temporary file for hyper-polarizability
-        echo " "
-        b0=("$xxx" "$xyx" "$xzx" "$xxy" "$xyy" "$xzy" "$xxz" "$xyz" "$xzz")
-        printf '%s\n' "${b0[@]}" > tempb0.txt
-        # rm tempb0.txt
-        # printf '%s\n' "${b0[@]}" >> tempb0.txt
-
-        b1=("$yxx" "$yyx" "$yzx" "$yxy" "$yyy" "$yzy" "$yxz" "$yyz" "$yzz")
-        printf '%s\n' "${b1[@]}" > tempb1.txt
-        #rm tempb1.txt
-        #printf '%s\n' "${b1[@]}" >> tempb1.txt
-
-        b2=("$zxx" "$zyx" "$zzx" "$zxy" "$zyy" "$zzy" "$zxz" "$zyz" "$zzz")
-        printf '%s\n' "${b2[@]}" > tempb2.txt
-        #rm tempb2.txt
-        #printf '%s\n' "${b2[@]}" >> tempb2.txt
-
-        # echo "----------------------------------------"
-
-        # format to a 2D matrix and save as .itx
-        # beta_x (b0)
-#        pr -t -3  tempb0.txt > b0.txt
-        sed -i '1s/^/IGOR\n/'  b0.txt
-        sed -i '2s|^|WAVES /D /N=(3,3) b'"$i"0"$k"'\n|' "b0.txt"
-        sed -i '3s/^/BEGIN\n/' b0.txt
-        echo -e 'END' >> b0.txt
-        sed -i "2 s/b/'b/;2 s/$/'/" b0.txt
-        cat b0.txt > property/mode_$i/b"$i"0"$k".itx
-
-        #sed "s|b'"$i"'0'"$k"'|\'b'"$i"'0'"$k"'\'|g" property/mode_$i/b"$i"0"$k".itx
-
-        # beta_y (b1)
-#        pr -t -3  tempb1.txt > b1.txt
-        sed -i '1s/^/IGOR\n/' b1.txt
-        sed -i '2s|^|WAVES /D /N=(3,3) b'"$i"1"$k"'\n|' "b1.txt"
-        sed -i '3s/^/BEGIN\n/' b1.txt
-        echo -e 'END' >> b1.txt
-        sed -i "2 s/b/'b/;2 s/$/'/" b1.txt
-        cat b1.txt > property/mode_$i/b"$i"1"$k".itx
-
-
-        # beta_z (b2)
-#        pr -t -3  tempb2.txt > b2.txt
-        sed -i '1s/^/IGOR\n/' b2.txt
-        sed -i '2s|^|WAVES /D /N=(3,3) b'"$i"2"$k"'\n|' "b2.txt"
-        sed -i '3s/^/BEGIN\n/' b2.txt
-        echo -e 'END' >> b2.txt
-        sed -i "2 s/b/'b/;2 s/$/'/" b2.txt
-        cat b2.txt > property/mode_$i/b"$i"2"$k".itx
-
         # -----------------------------------------------------------
 
         # making temporary file for polarizability
