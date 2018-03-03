@@ -1,14 +1,22 @@
 #!/bin/bash
 
-# This script extracts the polarizability which is calculated when calculating the hyperpolarizability in DALTON.
-# This script thus extracts polarizability from a calculation output meant to get hyperpolarizability (whose \
-#  output is well formatted)
+# purpose : extract polarizability from DFT calculation ( for hyperpolarizability, beta), where polarizability 
+#	is calculated since it is required for beta.
 
-# Takes filename as input. 
+# output is a file 'polarizability.dat' which contains the polarizability as 1D array as 
+#	xx
+#	yx
+#	zx
+#	xy
+#	yy
+#	zy
+#	xz
+#	yz
+#	zz
+
+#--------------------------------------------------------------------------------------------
+
 filename=$1
-
-# returns a file containing polarizability along columns.
-# output =  file = 'polarizability.dat'
 
 echo $filename
 rm polarizability.dat
@@ -24,8 +32,8 @@ echo "Lines : "$lines
 # Loop over line numbers
 for  (( i=0 ; i < $lines ; i=i+1 ));
 do
-#       echo $i,${target[i]}
-#       value=$($i)
+#	echo $i,${target[i]}
+#	value=$($i)
         NUM=${target[i]}
         vline=$((NUM+5))
         value=$(sed "${vline}q;d"  $filename | awk '{print $7}')
@@ -33,8 +41,20 @@ do
         pline1=$((NUM+2))
         pline2=$((NUM+3))
         p1=$(sed "${pline1}q;d"  $filename | awk '{print $6}')
-        p2=$(sed "${pline2}q;d"  $filename | awk '{print $6}')
+	p2=$(sed "${pline2}q;d"  $filename | awk '{print $6}')
 #        echo $p1 , $p2, $value
-        echo -n -e  "$value""\t" >> polarizability.dat
+        echo -n -e  "$value""\n" >> polarizability.dat
 
 done
+
+sed  -i  -e '1,3d' polarizability.dat
+cat polarizability.dat
+echo "-----"
+
+sed  -i -e '13,15d' polarizability.dat
+
+sed  -i -e '4,6d' polarizability.dat
+
+# polarizability.dat is the file of interest.
+
+# ----- end of script -----
