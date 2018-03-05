@@ -92,11 +92,11 @@ k=-2
 
         #####################################################################################
     
-        ###################### Polarizability ######################
+        ################################# Polarizability #################################
     
-	    sh ./Extract-DFT-polarizability "$file"
+	sh ./Extract-DFT-polarizability "$file"   # script which extracts the polarizability
         # output will be generated in polarizability.dat
-        s=$(<file)
+        s=$(<polarizability.dat)
         set -- $s
         echo "$1"
         echo "$2"
@@ -107,7 +107,16 @@ k=-2
         echo "$7"
         echo "$8"
         echo "$9"
-        #xx = 
+        
+	xx =$1
+	yx =$2
+	zx =$3
+	xy =$4
+	yy =$5
+	zy =$6
+	xz =$7
+	yz =$8
+	yy =$9
 
         ###################### Dipole moment ######################
     
@@ -127,7 +136,7 @@ k=-2
 
         #Energy
         # new code updated for DFT
-        en = $(grep -A 100 "End of optimization            :       T" dft_opt_freq_beta_benzene_TZ.out | grep "Total energy"| awk '{print $3}')
+        en = $(grep -A 100 "End of optimization            :       T" "$file" | grep "Total energy"| awk '{print $3}')
         #	en=$(grep "            Total CCSD  energy:         " "$fname"_"$i"_"$k".out   | awk {'print $4'} | xargs| awk {'print $1'}  )
         #	echo "energy:"."$en"
 
@@ -135,9 +144,10 @@ k=-2
         printf "Energy\n"
         echo "$en"
 
-        # FORMATTING AND SAVING OUTPUT FILES ------------------------------------------------
-        # -----------------------------------------------------------
-
+        # ---------------------- FORMATTING AND SAVING OUTPUT FILES -------------------------
+        # -----------------------------------------------------------------------------------
+        # hyperpolarizability is already exported.
+	
         # making temporary file for polarizability
 
         a=("$xx" "$yx" "$zx"  "$xy" "$yy" "$zy"  "$xz" "$yz"  "$zz")
