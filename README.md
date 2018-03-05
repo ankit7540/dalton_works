@@ -13,6 +13,5 @@ Refer to the readme mentioned in the folder and details mentioned in the beginni
 (Author is not responsible for any loss of data using these scripts.) 
 
 -----------------------------------
------------------------------------
 
 `basic_run.sh`  : Used for running a calculation job. It sources the compilers, scratch direrctory and allocates memory, CPU cores and starts calculation. A log is created for every calcualtion storing the file names, directory, description and the time taken. This script needs editing for the address for the scratch directory, address for the log file, etc... hence edit accordingly.
