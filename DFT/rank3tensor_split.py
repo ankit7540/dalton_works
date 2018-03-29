@@ -30,7 +30,8 @@ betaZ=np.zeros((3,3))
 for i in range(3):
     for j in range(3):
         betaZ[i][j] = beta[2][i][j]
-#print(betaZ)
+
+#print(betaZ)   # for printing out the tensor
 
 np.savetxt('beta2.txt',(betaZ), fmt='%6.7e')
 np.savetxt('b2.txt',(betaZ), fmt='%6.7e')

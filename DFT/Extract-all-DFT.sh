@@ -1,5 +1,5 @@
 #!/bin/bash
-    
+
 # take out energy, dipole moment, polarizability and hyperpolarizability from DALTON DFT output file.
 # run as loop over n files where for each n file  -2 to +2 additional files are available in the same folder.
 
@@ -8,16 +8,15 @@
 echo "Enter the largest file index : "
 read n # number of files
 #read fname
-fname="hyper_ccsd_c"
+fname="dft_beta_c"
 
 # ----- prepare folder to keep data ------
 rm -rf property
 mkdir -p  property
-
 # ----------------------------------------
 
-i=2 # file numbering starts from 0
-
+i=0 # file numbering starts from 0
+echo "loop starting"
 while [ "$i" -le "$n" ]
 do
 k=-2
@@ -26,12 +25,11 @@ k=-2
     while [ "$k" -le 2 ]
     do
         #echo "$fname"_"$i"_"$k".out
-        file = $(echo "$fname"_"$i"_"$k".out)
+        file=$(echo "$fname"_"$i"_"$k".out)
         echo "$file"
         #####################  Hyperpolarizability #####################
-        grep -A 110  "DFT-QR computed in a linearly-scaling fashion." "$file" > temp
+        grep -A 110  "DFT-QR computed in a linearly-scaling fashion." $file > temp
         tail -109 temp > temp2
-
         awk '{print $8 $9 $10}' temp2 > temp3
 
         sed -i 's/;/,/g' temp3
@@ -48,17 +46,17 @@ k=-2
         # three 3x3 matrices are extracted for Igor output.
 
         echo "# python script : generate hyperpolarizability tensor and also three matrices" > process_beta.py
-        
+
         echo "import numpy as np" >> process_beta.py
 
         echo "beta=np.zeros((3,3,3))" >> process_beta.py
         cat temp3 >> process_beta.py
 
-        echo "print(beta)" >> process_beta.py
+        #echo "print(beta)" >> process_beta.py
 
         #-------------------------------------------------
 
-        # post processing  the beta tensor 
+        # post processing  the beta tensor
 
         cat rank3tensor_split.py >> process_beta.py
         python process_beta.py
@@ -88,40 +86,37 @@ k=-2
         cat b2.txt > property/mode_$i/b"$i"2"$k".itx
 
         rm b0.txt b1.txt b2.txt
-        rm temp temp2 temp3 
+        rm temp temp2 temp3
 
         #####################################################################################
-    
-        ################################# Polarizability #################################
-    
-	sh ./Extract-DFT-polarizability "$file"   # script which extracts the polarizability
+
+        ################################### Polarizability ##################################
+
+
+        ./Extract-DFT-polarizability.sh  "$file"   # script which extracts the polarizability
         # output will be generated in polarizability.dat
+        # echo "I am here..... "
         s=$(<polarizability.dat)
         set -- $s
-        echo "$1"
-        echo "$2"
-        echo "$3"
-        echo "$4"
-        echo "$5"
-        echo "$6"
-        echo "$7"
-        echo "$8"
-        echo "$9"
-        
-	xx =$1
-	yx =$2
-	zx =$3
-	xy =$4
-	yy =$5
-	zy =$6
-	xz =$7
-	yz =$8
-	yy =$9
+        # echo $1,$2,$3,$4,$5,$6,$7,$8,$9
+
+        xx=$1
+        yx=$2
+        zx=$3
+        xy=$4
+        yy=$5
+        zy=$6
+        xz=$7
+        yz=$8
+        zz=$9
+
+
+        #####################################################################################
 
         ###################### Dipole moment ######################
-    
+
         # Dipole moment part of output exported to a temp file (for DFT, same as CCSD)
-        grep -A 10 "Dipole moment components" "$fname"_"$i"_"$k".out > muTemp 
+        grep -A 10 "Dipole moment components" "$fname"_"$i"_"$k".out > muTemp
         mu_x=$(grep "      x     "  "muTemp" | awk {'print $2'} )
         mu_y=$(grep "      y     "  "muTemp" | awk {'print $2'} )
         mu_z=$(grep "      z     "  "muTemp" | awk {'print $2'} )
@@ -130,24 +125,24 @@ k=-2
         if [ -z  "$mu_y" ]; then mu_y=0 ; fi
         if [ -z  "$mu_z" ]; then mu_z=0 ; fi
 
-        echo " "
-        printf "Dipole moment\n"
+        #echo " "
+        #printf "Dipole moment\n"
         echo "$mu_x,$mu_y,$mu_z"
 
         #Energy
         # new code updated for DFT
-        en = $(grep -A 100 "End of optimization            :       T" "$file" | grep "Total energy"| awk '{print $3}')
-        #	en=$(grep "            Total CCSD  energy:         " "$fname"_"$i"_"$k".out   | awk {'print $4'} | xargs| awk {'print $1'}  )
-        #	echo "energy:"."$en"
-
-        echo " "
-        printf "Energy\n"
-        echo "$en"
+        en=$(grep "@    Final DFT energy:" "$fname"_"$i"_"$k".out  | awk '{print $5}' )
+        #       en=$(grep "            Total CCSD  energy:         " "$fname"_"$i"_"$k".out   | awk {'print $4'} | xargs| awk {'print $1'}  )
+        #       echo "energy:"."$en"
+        echo $en
+        #echo " "
+        #printf "Energy\n"
+        #echo "$en"
 
         # ---------------------- FORMATTING AND SAVING OUTPUT FILES -------------------------
         # -----------------------------------------------------------------------------------
         # hyperpolarizability is already exported.
-	
+
         # making temporary file for polarizability
 
         a=("$xx" "$yx" "$zx"  "$xy" "$yy" "$zy"  "$xz" "$yz"  "$zz")
@@ -189,6 +184,29 @@ k=-2
         # ---------------------------------------------------------------------------
 
 
+        # making temporary file for  dipole moment
+        dm=("$mu_x" "$mu_y" "$mu_z" )
+        printf '%s\n' "${dm[@]}" > tempdm.txt
+        # format to a 1D matrix and save as .itx
+        sed -i '1s/^/IGOR\n/' tempdm.txt
+        sed -i '2s|^|WAVES /D /N=(3,1) dm_'"$i"_"$k"'\n|' "tempdm.txt"
+        sed -i '3s/^/BEGIN\n/' tempdm.txt
+        echo -e 'END' >> tempdm.txt
+        sed -i "2 s/dm/'dm/;2 s/$/'/" tempdm.txt
+        cat tempdm.txt > property/mode_$i/dm$i$k.itx
+        # ----------------------------------------
+
+        # making temporary file for  energy
+        e=("$en")
+        printf '%s\n' "${e[@]}" > tempen.txt
+        sed -i '1s/^/IGOR\n/' tempen.txt
+        sed -i '2s|^|WAVES /D en_'"$i"_"$k"'\n|' "tempen.txt"
+        sed -i '3s/^/BEGIN\n/' tempen.txt
+        echo -e 'END' >> tempen.txt
+        sed -i "2 s/en/'en/;2 s/$/'/" tempen.txt
+        cat tempen.txt> property/mode_$i/e$i$k.itx
+        # format to a 1D matrix and save as .itx
+
 
         echo "----------------------------------------"
 
@@ -200,5 +218,5 @@ k=-2
 
 ((i++))
 done
-rm tempb0.txt tempb1.txt tempb2.txt  tempdm.txt tempa.txt tempen.txt
+#rm tempb0.txt tempb1.txt tempb2.txt  tempdm.txt tempa.txt tempen.txt
 echo " data extracted"
