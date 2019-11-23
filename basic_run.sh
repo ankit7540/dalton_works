@@ -32,10 +32,11 @@
     
     ##################################################################
     
-    echo -e 'Job started @ '$dt'' >> $log_path  # log the start of job
+    echo -e 'Job started @ '$dt'' >> "${log_path}"  # log the start of job
     
-    cd $dalton_ins # custom modified installation
+    cd "$dalton_ins" # change to the dalton installation directory
     echo "-----------------------------------------------"
+    
     df -h /dev/md0
     echo "-----------------------------------------------"
     
@@ -54,10 +55,9 @@
     echo "//-------process started----------------------------//"
     dt1=$(date '+%d/%m/%Y %H:%M:%S');
     #following line calls the program and runs the job.
-    ./dalton -b $basis_folder   -w  "$dir"    -mb $mem   $d   $m
+    ./dalton -b "$basis_folder"   -w  "$dir"    -mb $mem   $d   $m
 
     dt2=$(date '+%d/%m/%Y %H:%M:%S');
  # Give path to the log file in the string below. Details of the calculation will be saved there.
- log_path=""
- printf "\n$dt1\nFrom : $dir\nRunning : $d\t$m\nDetail : $text\n$dt2\n--------------------------------------------------------\n" >> $log_path
+ printf "\n$dt1\nFrom : $dir\nRunning : $d\t$m\nDetail : $text\n$dt2\n--------------------------------------------------------\n" >> "${log_path}"
 echo "//-----------------process FINISHED ----------------//"
