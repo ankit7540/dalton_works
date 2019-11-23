@@ -31,22 +31,24 @@
     
     
     ##################################################################
-    
-    echo -e 'Job started @ '$dt'' >> "${log_path}"  # log the start of job
-    
-    cd "$dalton_ins" # change to the dalton installation directory
-    echo "-----------------------------------------------"
-    
-    df -h /dev/md0
-    echo "-----------------------------------------------"
-    
-    # Log of the current job. Will be saved with start and end time and this message which 
-    # +is asked after script is executed.
-    echo -n "Enter calculation details and press [ENTER]: "
-    read  -e  -n 500 text
-    
+
+    echo "----------- DALTON run script ----------------"
+    echo -e 'Job started @ '$dt'' >> $log_path  # log the start of job
+
+    cd $dalton_ins # custom modified installation
 
     echo "-----------------------------------------------"
+    df -h "$scratch"
+    echo "-----------------------------------------------"
+
+    # Log of the current job. Will be saved with start and end time and this message which
+    # +is asked after script is executed.
+
+    echo -n "Enter calculation details and press [ENTER]: "
+    read  -e  -n 500 text
+
+    echo "-----------------------------------------------"
+
     export DALTON_TMPDIR=$scratch
     export OMP_NUM_THREADS=$cores
     source $compiler_path1 $compiler_arg
@@ -55,9 +57,14 @@
     echo "//-------process started----------------------------//"
     dt1=$(date '+%d/%m/%Y %H:%M:%S');
     #following line calls the program and runs the job.
-    ./dalton -b "$basis_folder"   -w  "$dir"    -mb $mem   $d   $m
+
+    ./dalton -b $basis_folder   -w  "$dir"    -mb $mem   $d   $m
 
     dt2=$(date '+%d/%m/%Y %H:%M:%S');
- # Give path to the log file in the string below. Details of the calculation will be saved there.
- printf "\n$dt1\nFrom : $dir\nRunning : $d\t$m\nDetail : $text\n$dt2\n--------------------------------------------------------\n" >> "${log_path}"
-echo "//-----------------process FINISHED ----------------//"
+
+    # Give path to the log file in the string below. Details of the calculation will be saved there.
+
+    printf "\n$dt1\nFrom : $dir\nRunning : $d\t$m\nDetail : $text\n$dt2\n--------------------------------------------------------\n" >> "${log_path}"
+
+    echo "//-----------------process FINISHED ----------------//"
+
