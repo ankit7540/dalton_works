@@ -33,7 +33,7 @@
     ##################################################################
 
     echo "----------- DALTON run script ----------------"
-    echo -e 'Job started @ '$dt'' >> $log_path  # log the start of job
+    echo -e 'Job started @ '$dt'' >> "$log_path"  # log the start of job
 
     cd $dalton_ins # custom modified installation
 
@@ -49,7 +49,7 @@
 
     echo "-----------------------------------------------"
 
-    export DALTON_TMPDIR=$scratch
+    export DALTON_TMPDIR="$scratch"
     export OMP_NUM_THREADS=$cores
     source $compiler_path1 $compiler_arg
     source $compiler_path2 $compiler_arg
@@ -58,7 +58,7 @@
     dt1=$(date '+%d/%m/%Y %H:%M:%S');
     #following line calls the program and runs the job.
 
-    ./dalton -b $basis_folder   -w  "$dir"    -mb $mem   $d   $m
+    ./dalton -b "$basis_folder"   -w  "$dir"    -mb $mem   $d   $m
 
     dt2=$(date '+%d/%m/%Y %H:%M:%S');
 
