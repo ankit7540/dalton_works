@@ -1,32 +1,49 @@
 #!/bin/bash
 # adapting basis function as DALTON output from EMSL to input acceptable in DALTON
+# Format : DALTON from EMSL basis set exchange website
+
 file="$1"
+        echo -e "Input file : " "$file""\n"
+        basis_line=$(grep 'Basis = ' $file )
+        basis=$( echo $basis_line | awk  '{print $4}' )
 
-	echo -e "Input file : " "$file""\n" 
+        lna=$(grep -n  -E '\ba ' $file  | awk -F: '{print $1}')
+        #echo $lna; # line number which character a and atomic number
+        lnb=$(bc <<< "($lna+1)")
+        str=$(awk "NR==$lnb" $file)
+        #echo $lnb $str;
+        atom=$( echo $str | awk  '{print $2}' )
+        echo "ATOM : " $atom "Basis : " $basis;
 
-	# commands for modifying the text in the file
+	# name of output file (consists of basis name and atom)
+        output="mod_"$basis"_"$atom
+        echo "output file : "$output;
+
+        # commands for modifying the text in the file
 	sed '/^!/ d' "$file" > temp1
-	sed 's/H/f /g' temp1 > temp2	
-	sed 's/0.0000000/0.0/g' temp2 > temp3
-	sed -i 's/1.0000000/1.0/g' temp3
-	sed -i 's/.0000000/.0/g' temp3
-	sed -i 's/              /  /g' temp3
-	sed "s/^[ \t]*//" -i temp3
-	sed -i 's/    / /g' temp3
+        sed 's/H/f /g' temp1 > temp2
+        sed 's/0.0000000/0.0/g' temp2 > temp3
+        sed -i 's/1.0000000/1.0/g' temp3
+        sed -i 's/.0000000/.0/g' temp3
+        sed -i 's/              /  /g' temp3
+        sed "s/^[ \t]*//" -i temp3
+        sed -i 's/    / /g' temp3
 
-	mv temp3  mod_basis
-	rm temp1  temp2
+	# remove the line with alphabet a
+        sed -e '/^a/ d' temp3  >  "$output"
+	
+	# remove empty lines
+        sed -i '/^[[:space:]]*$/d'  "$output"
+	
+	# delete empty lines
+        rm temp1  temp2 temp3
+	
+        echo "-------------- line content and character count ----------------"
 
-	echo "--------------------------"
-
-	cat mod_basis | while read line
-#	echo "Line content  " " -  " "Character count"
-
-	do
-	count=$(echo $line | wc -c)
-	#num
-	echo $line  "  -  "  $count
-	done
-
-	echo -e "\n Output file mod_basis generated. \n"
-
+        cat  "$output"  | while read line
+        do
+	        count=$(echo $line | wc -c)
+        	echo $line  "  -  "  $count
+        done
+	echo -e "\n Output file :  $output   generated. \n"
+######################################################################################
