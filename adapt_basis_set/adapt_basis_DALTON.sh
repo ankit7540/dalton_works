@@ -24,7 +24,7 @@ file="$1"
         sed 's/H/f /g' temp1 > temp2
         sed 's/0.0000000/0.0/g' temp2 > temp3
         sed -i 's/1.0000000/1.0/g' temp3
-        sed -i 's/.0000000/.0/g' temp3
+        sed -i 's/.000000/.0/g' temp3
         sed -i 's/              /  /g' temp3
         sed "s/^[ \t]*//" -i temp3
         sed -i 's/    / /g' temp3
