@@ -4,13 +4,13 @@
 # Edit the cores of CPU below.
 cores=6
 
-# Scratch disk is set to RAID0 array.
-# Compiler set to Intel 2017. ( Change as your need).
+# Scratch disk is set to RAID0 array (change as your need) 
+# Compiler set to Intel 2017  (change as your need) 
 
 now=$(date +"%d-%m-%y")
 echo "$now"
 build_folder="build"_"$now"
-echo "$build_folder"
+echo "$build_folder"   # this will be made in the build process
 
     echo "-----------------------------------------------"
     export DALTON_TMPDIR=/mnt/raid0/scratch
@@ -20,7 +20,7 @@ echo "$build_folder"
     export MATH_ROOT='/opt/intel/mkl' 
     echo "-----------------------------------------------"
 
-
+#      --int64 is most likely not needed for day to day calculations (required if more than 16GB of memory needed)
 ./setup --int64  --fc=ifort --cc=icc --cxx=icpc --mkl=parallel --prefix=~/ChemPackage/dalton/dalton64bit/   $build_folder
 
 read -r -p "Are you sure? [y/N] " response
